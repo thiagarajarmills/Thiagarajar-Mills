@@ -127,12 +127,10 @@ export default function Stage5_Payment() {
             const targetIdx = workflow.indexOf(5);
 
             if (currentIdx === -1 || currentIdx < targetIdx) {
-                if (!lotId) {
-                    const prevStage = Boolean(res.data.is_privileged) ? "Quality (Stage 2)" : "Lot Entry (Stage 3)";
-                    alert(`This contract/lot is not yet ready for Payment Entry. Please complete ${prevStage} first.`);
-                    navigate('/dashboard');
-                    return;
-                }
+                const prevStage = Boolean(res.data.is_privileged) ? "Quality (Stage 2)" : "Lot Entry (Stage 3)";
+                alert(`This contract/lot is not yet ready for Payment Entry. Please complete ${prevStage} first.`);
+                navigate('/dashboard');
+                return;
             }
 
             if (lotId) {
