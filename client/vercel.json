@@ -2,11 +2,11 @@
     "rewrites": [
         {
             "source": "/api/:path*",
-            "destination": "https://tce-mills-backend.onrender.com/api/:path*"
+            "destination": "https://thiagarajar-mills.onrender.com/api/:path*"
         },
         {
             "source": "/uploads/:path*",
-            "destination": "https://tce-mills-backend.onrender.com/uploads/:path*"
+            "destination": "https://thiagarajar-mills.onrender.com/uploads/:path*"
         },
         {
             "source": "/(.*)",
