@@ -668,13 +668,13 @@ export default function Stage1_Create() {
                         )}
                         <button
                             type="submit"
-                            disabled={formData.document_path && !isFileViewed}
-                            className={`w-full font-bold py-4 rounded-xl shadow-lg transition-all transform flex items-center justify-center gap-3 text-lg ${formData.document_path && !isFileViewed
+                            disabled={!formData.document_path || !isFileViewed}
+                            className={`w-full font-bold py-4 rounded-xl shadow-lg transition-all transform flex items-center justify-center gap-3 text-lg ${!formData.document_path || !isFileViewed
                                 ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
                                 : 'bg-indigo-600 hover:bg-indigo-700 text-white hover:shadow-indigo-500/30 active:scale-[0.98]'
                                 }`}
                         >
-                            <Plus size={24} /> {formData.document_path && !isFileViewed ? 'View Document to Create' : 'Create Contract'}
+                            <Plus size={24} /> {!formData.document_path ? 'Upload Document to Create' : (!isFileViewed ? 'View Document to Create' : 'Create Contract')}
                         </button>
                     </div>
                 </form>

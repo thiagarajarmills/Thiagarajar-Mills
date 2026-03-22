@@ -787,13 +787,13 @@ export default function Stage4_CTL() {
                 <div className="flex justify-center pt-8 border-t border-slate-200 mt-10">
                     <button
                         type="submit"
-                        disabled={formData.report_document_path && !isFileViewed}
-                        className={`w-full max-w-2xl px-6 py-5 rounded-2xl font-bold shadow-xl transition-all flex items-center justify-center gap-3 text-xl ${formData.report_document_path && !isFileViewed
+                        disabled={!formData.report_document_path || !isFileViewed}
+                        className={`w-full max-w-2xl px-6 py-5 rounded-2xl font-bold shadow-xl transition-all flex items-center justify-center gap-3 text-xl ${!formData.report_document_path || !isFileViewed
                             ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
                             : 'bg-indigo-600 hover:bg-slate-900 text-white hover:shadow-indigo-500/30 active:scale-[0.98]'
                             }`}
                     >
-                        <Check size={28} /> {formData.report_document_path && !isFileViewed ? 'View Document to Submit' : 'Submit CTL Results'}
+                        <Check size={28} /> {!formData.report_document_path ? 'Upload Document to Submit' : (!isFileViewed ? 'View Document to Submit' : 'Submit CTL Results')}
                     </button>
                 </div>
             </form>

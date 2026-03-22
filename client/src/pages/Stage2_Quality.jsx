@@ -413,7 +413,7 @@ export default function Stage2_Quality() {
 
                             <div className="pt-2">
                                 <FileUpload
-                                    label="Upload Quality Report"
+                                    label="Upload Quality Report (Optional)"
                                     initialPath={formData.report_document_path}
                                     onUploadComplete={handleDocumentUpload}
                                     onVerified={handleFileView}
