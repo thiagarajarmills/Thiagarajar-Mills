@@ -282,10 +282,10 @@ export default function Stage2_Quality() {
                             />
                             <div className="flex gap-4">
                                 <button onClick={() => handleSubmitChairman('Reject')} className="flex-1 bg-white border-2 border-rose-200 text-rose-700 hover:bg-rose-50 px-4 py-4 rounded-xl font-semibold transition-all shadow-sm flex items-center justify-center gap-2">
-                                    <X size={20} /> <span className="text-lg">Reject Report</span>
+                                    <span className="text-lg">Reject Report</span>
                                 </button>
                                 <button onClick={() => handleSubmitChairman('Approve')} className="flex-[2] bg-emerald-600 text-white hover:bg-emerald-700 px-6 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-emerald-500/20 hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                                    <Check size={24} /> <span className="text-lg">Approve Quality</span>
+                                    <span className="text-lg">Approve Quality</span>
                                 </button>
                             </div>
                         </div>
@@ -443,7 +443,7 @@ export default function Stage2_Quality() {
                             : 'bg-indigo-600 hover:bg-slate-900 text-white hover:shadow-indigo-500/30 active:scale-[0.98]'
                             }`}
                     >
-                        <Check size={28} /> {formData.report_document_path && !isFileViewed ? 'View Document to Submit' : 'Submit Quality Report'}
+                        {formData.report_document_path && !isFileViewed ? 'View Document to Submit' : 'Submit Quality Report'}
                     </button>
                 </div>
             </form>

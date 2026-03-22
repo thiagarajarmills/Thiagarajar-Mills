@@ -520,10 +520,10 @@ export default function Stage1_Create() {
                                 />
                                 <div className="flex gap-4">
                                     <button onClick={() => handleSubmitChairman('Reject')} className="flex-1 bg-white border-2 border-rose-200 text-rose-700 hover:bg-rose-50 px-4 py-4 rounded-xl font-semibold transition-all shadow-sm flex items-center justify-center gap-2">
-                                        <X size={20} /> <span className="text-lg">Reject Contract</span>
+                                        <span className="text-lg">Reject Contract</span>
                                     </button>
                                     <button onClick={() => handleSubmitChairman('Approve')} className="flex-[2] bg-emerald-600 text-white hover:bg-emerald-700 px-6 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-emerald-500/20 hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                                        <Check size={24} /> <span className="text-lg">Approve Contract</span>
+                                        <span className="text-lg">Approve Contract</span>
                                     </button>
                                 </div>
                             </div>
@@ -674,7 +674,7 @@ export default function Stage1_Create() {
                                 : 'bg-indigo-600 hover:bg-indigo-700 text-white hover:shadow-indigo-500/30 active:scale-[0.98]'
                                 }`}
                         >
-                            <Plus size={24} /> {!formData.document_path ? 'Upload Document to Create' : (!isFileViewed ? 'View Document to Create' : 'Create Contract')}
+                            {!formData.document_path ? 'Upload Document to Create' : (!isFileViewed ? 'View Document to Create' : 'Create Contract')}
                         </button>
                     </div>
                 </form>

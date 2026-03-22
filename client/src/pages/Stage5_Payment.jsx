@@ -655,13 +655,13 @@ export default function Stage5_Payment() {
                         />
                         <div className="flex gap-4">
                             <button onClick={() => handleSubmitChairman('Reject')} className="flex-1 bg-white border-2 border-rose-200 text-rose-700 hover:bg-rose-50 px-4 py-4 rounded-xl font-semibold transition-all shadow-sm flex items-center justify-center gap-2">
-                                <X size={20} /> <span className="text-lg">Deny</span>
+                                <span className="text-lg">Deny</span>
                             </button>
                             <button onClick={() => handleSubmitChairman('Modify')} className="flex-1 bg-amber-100 border-2 border-amber-200 text-amber-800 hover:bg-amber-200 px-4 py-4 rounded-xl font-semibold transition-all shadow-sm flex items-center justify-center gap-2">
-                                <RotateCcw size={20} /> <span className="text-lg">Revision</span>
+                                <span className="text-lg">Revision</span>
                             </button>
                             <button onClick={() => handleSubmitChairman('Approve')} className="flex-[2] bg-emerald-600 text-white hover:bg-emerald-700 px-6 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-emerald-500/20 hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                                <Check size={24} /> <span className="text-lg">Approve for Payment</span>
+                                <span className="text-lg">Approve for Payment</span>
                             </button>
                         </div>
                     </div>
@@ -738,7 +738,6 @@ export default function Stage5_Payment() {
                         }}
                         className={`w-full max-w-2xl px-6 py-5 rounded-2xl font-semibold shadow-xl transition-all flex items-center justify-center gap-3 text-xl ${isRollbackRequest ? 'bg-amber-600 hover:bg-slate-900 text-white hover:shadow-amber-500/30' : 'bg-indigo-600 hover:bg-slate-900 text-white hover:shadow-indigo-500/30'} active:scale-[0.98]`}
                     >
-                        {isRollbackRequest ? <RotateCcw size={28} /> : <Check size={28} />}
                         {isRollbackRequest ? "Update Bill & Re-submit" : "Generate Final Bill"}
                     </button>
                     <p className="mt-4 text-slate-400 text-xs font-medium">Please review the bill preview on the left before generating.</p>

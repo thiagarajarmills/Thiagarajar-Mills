@@ -374,11 +374,8 @@ export default function Stage3_Sampling() {
                             {isManager && remainingBales > 0 && (
                                 <button
                                     onClick={() => setIsArrived(true)}
-                                    className="bg-indigo-600 hover:bg-slate-900 text-white font-black py-5 px-10 rounded-2xl shadow-2xl hover:shadow-indigo-500/30 hover:-translate-y-1 active:translate-y-0 transition-all flex items-center gap-4 text-xl group"
+                                    className="bg-indigo-600 hover:bg-slate-900 text-white font-black py-5 px-10 rounded-2xl shadow-2xl hover:shadow-indigo-500/30 hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-4 text-xl group"
                                 >
-                                    <span className="bg-white/20 p-2 rounded-xl group-hover:rotate-12 transition-transform">
-                                        <CheckCircle size={28} strokeWidth={3} />
-                                    </span>
                                     Lot Arrived
                                 </button>
                             )}
@@ -635,7 +632,7 @@ export default function Stage3_Sampling() {
                                             type="submit"
                                             className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 px-8 rounded-2xl shadow-xl shadow-indigo-500/30 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 active:translate-y-0"
                                         >
-                                            <Plus size={24} strokeWidth={3} /> Record Lot Arrival
+                                            Record Lot Arrival
                                         </button>
                                     </div>
                                 </form>
