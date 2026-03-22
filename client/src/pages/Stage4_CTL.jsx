@@ -86,10 +86,12 @@ export default function Stage4_CTL() {
                 const currentIdx = workflow.indexOf(res.data.stage === 6 ? 6 : res.data.stage);
 
                 if (currentIdx === -1 || currentIdx < workflow.indexOf(4)) {
-                    const prevStage = Boolean(res.data.is_privileged) ? "Payment (Stage 5)" : "Lot Entry (Stage 3)";
-                    alert(`This contract/lot is not yet ready for CTL Entry. Please complete ${prevStage} first.`);
-                    navigate('/dashboard');
-                    return;
+                    if (!lotId) {
+                        const prevStage = Boolean(res.data.is_privileged) ? "Payment (Stage 5)" : "Lot Entry (Stage 3)";
+                        alert(`This contract/lot is not yet ready for CTL Entry. Please complete ${prevStage} first.`);
+                        navigate('/dashboard');
+                        return;
+                    }
                 }
             }
 
