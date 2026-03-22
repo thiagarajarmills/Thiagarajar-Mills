@@ -50,7 +50,7 @@ export default function Layout() {
                 <div className="px-6 py-4 border-b border-slate-100 flex items-center space-x-3">
                     <img src="/temple.webp" alt="Thiagarajar Mills" className="h-12 w-12 object-contain shrink-0" />
                     <div className="leading-tight">
-                        <p className="text-[13px] font-semibold text-blue-600 leading-snug">Thiagarajar mills</p>
+                        <p className="text-[13px] font-semibold text-blue-600 leading-snug">Thiagarajar Mills</p>
                         <p className="text-[11px] text-slate-400">(P) limited</p>
                     </div>
                 </div>

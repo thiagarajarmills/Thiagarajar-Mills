@@ -33,7 +33,7 @@ export default function Login() {
                     <div className="flex items-center justify-center space-x-3 mb-2">
                         <img src="/temple.webp" alt="Thiagarajar Mills" className="h-16 w-16 object-contain shrink-0" />
                         <div className="leading-tight text-left">
-                            <p className="text-[18px] font-semibold text-blue-600 leading-snug">Thiagarajar mills</p>
+                            <p className="text-[18px] font-semibold text-blue-600 leading-snug">Thiagarajar Mills</p>
                             <p className="text-[13px] text-slate-400">(P) limited</p>
                         </div>
                     </div>
