@@ -786,6 +786,52 @@ export default function Stage4_CTL() {
                         {!formData.report_document_path ? 'Upload Document to Submit' : (!isFileViewed ? 'View Document to Submit' : 'Submit CTL Results')}
                     </button>
                 </div>
+
+                {/* Status Strip */}
+                {(() => {
+                    const decision = activeLot.s4Decision?.decision;
+                    const remarks = activeLot.s4Decision?.remarks;
+                    if (decision === 'Approve') return (
+                        <div className="rounded-xl border p-4 shadow-sm mt-6 bg-emerald-50 border-emerald-100">
+                            <div className="flex items-center space-x-3">
+                                <div className="bg-emerald-100 text-emerald-700 rounded-full p-2"><Check size={24} /></div>
+                                <div>
+                                    <p className="font-bold text-base text-emerald-800">CTL Approved</p>
+                                    <p className="text-sm text-emerald-600 opacity-75">Verified by Chairman</p>
+                                    {remarks && <p className="text-sm text-emerald-700 mt-1 italic">"{remarks}"</p>}
+                                </div>
+                            </div>
+                        </div>
+                    );
+                    if (decision === 'Reject') return (
+                        <div className="rounded-xl border p-4 shadow-sm mt-6 bg-rose-50 border-rose-100">
+                            <div className="flex items-center space-x-3">
+                                <div className="bg-rose-100 text-rose-700 rounded-full p-2"><X size={24} /></div>
+                                <div>
+                                    <p className="font-bold text-base text-rose-800">Rejected by Chairman</p>
+                                    {remarks && (
+                                        <div className="mt-2 pt-2 border-t border-rose-100">
+                                            <span className="text-[10px] font-bold text-rose-600 uppercase block mb-1">Chairman Remark</span>
+                                            <p className="text-sm text-rose-700 italic">"{remarks}"</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    );
+                    if (isManager && isPendingApproval) return (
+                        <div className="rounded-xl border p-4 shadow-sm mt-6 bg-amber-50 border-amber-100">
+                            <div className="flex items-center space-x-3">
+                                <div className="bg-amber-100 text-amber-700 rounded-full p-2"><RotateCcw size={24} /></div>
+                                <div>
+                                    <p className="font-bold text-base text-amber-800">Under Review</p>
+                                    <p className="text-sm text-amber-600 opacity-75">Waiting for Chairman to review CTL results</p>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                    return null;
+                })()}
             </form>
         </div >
     );
