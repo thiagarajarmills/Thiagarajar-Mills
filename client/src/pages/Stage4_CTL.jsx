@@ -80,26 +80,8 @@ export default function Stage4_CTL() {
             const res = await api.get(`/contracts/${safeId}`);
             setContract(res.data);
 
-            // NAVIGATION GUARD — skip for Chairman (they review all submissions)
-            if (user.role !== 'Chairman') {
-                const isPrivileged = Boolean(res.data.is_privileged);
-
-                if (isPrivileged) {
-                    // Privileged vendors: check contract-level workflow
-                    const workflow = [1, 2, 5, 3, 4];
-                    const currentIdx = workflow.indexOf(res.data.stage === 6 ? 6 : res.data.stage);
-                    if (currentIdx === -1 || currentIdx < workflow.indexOf(4)) {
-                        alert(`This contract is not yet ready for CTL Entry. Please complete Payment (Stage 5) first.`);
-                        navigate('/dashboard');
-                        return;
-                    }
-                } else {
-                    // Normal vendors: each lot is independent.
-                    // A lot can move to Stage 4 (CTL) as soon as it exists in Stage 3.
-                    // We just need to verify the lot itself exists — checked after fetch below.
-                    // No contract-wide stage block here.
-                }
-            }
+            // Navigation enforcement is handled by useEffect below, which checks
+            // decision-level approvals per vendor type (more accurate than contract.stage).
 
             // Find Active Lot
             if (res.data.lots && lotId) {
