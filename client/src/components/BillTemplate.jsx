@@ -7,7 +7,7 @@ const BillTemplate = ({ contract, lot, paymentData }) => {
     const dateFmt = (d) => {
         if (!d) return '';
         const date = new Date(d);
-        return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()} `;
+        return `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear()}`;
     };
 
     // Data Extraction

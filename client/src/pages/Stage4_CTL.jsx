@@ -10,7 +10,12 @@ import { getFullUrl } from '../utils/urls';
 
 const formatDate = (dateStr) => {
     if (!dateStr) return '';
-    return dateStr.split('T')[0];
+    const cleanDate = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+    const parts = cleanDate.split('-');
+    if (parts.length === 3 && parts[0].length === 4) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    return cleanDate;
 };
 
 export default function Stage4_CTL() {
@@ -406,22 +411,22 @@ export default function Stage4_CTL() {
                                     </div>
                                 </div>
                                 <div className="col-span-1">
-                                    <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">Avg Trash %</label>
+                                    <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">Avg Trash GPT</label>
                                     <div className="text-slate-900 font-bold border-b border-slate-100 pb-1 flex items-center gap-2">
-                                        {calculateAvgTrash()}%
+                                        {calculateAvgTrash()} GPT
                                         <span className="text-[10px] text-slate-400 font-normal">(Auto-calculated)</span>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Individual Trash Percentages */}
+                            {/* Individual Trash GPT */}
                             {Object.keys(trashSamples).length > 0 && (
                                 <div className="mt-8 pt-6 border-t border-slate-100">
                                     <h4 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
                                         <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                         </svg>
-                                        Individual Trash % Analysis
+                                        Individual Trash GPT Analysis
                                     </h4>
                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
                                         {sequences.map(seq => (
@@ -434,7 +439,7 @@ export default function Stage4_CTL() {
                                                     ? 'text-slate-900'
                                                     : 'text-slate-200'
                                                     }`}>
-                                                    {trashSamples[seq.num] != null ? `${trashSamples[seq.num]}%` : '-'}
+                                                    {trashSamples[seq.num] != null ? `${trashSamples[seq.num]} GPT` : '-'}
                                                 </div>
                                             </div>
                                         ))}
@@ -615,7 +620,7 @@ export default function Stage4_CTL() {
                                 <input type="number" step="0.1" name="uhml" value={formData.uhml} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2.5 font-medium" />
                             </div>
                             <div>
-                                <label className="block text-slate-500 text-[10px] uppercase font-bold tracking-wide mb-1">UI %</label>
+                                <label className="block text-slate-500 text-[10px] uppercase font-bold tracking-wide mb-1">UI GPT</label>
                                 <input type="number" step="0.1" name="ui_percent" value={formData.ui_percent} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2.5 font-medium" />
                             </div>
                             <div>
@@ -643,7 +648,7 @@ export default function Stage4_CTL() {
                                 <input type="text" name="colour_grade" value={formData.colour_grade} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2.5 font-medium" />
                             </div>
                             <div>
-                                <label className="block text-slate-500 text-[10px] uppercase font-bold tracking-wide mb-1">Moisture %</label>
+                                <label className="block text-slate-500 text-[10px] uppercase font-bold tracking-wide mb-1">Moisture GPT</label>
                                 <input type="number" step="0.1" name="moisture_percent" value={formData.moisture_percent} onChange={handleChange} className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2.5 font-medium" />
                             </div>
                             {/* SCI Input Manually */}
@@ -698,8 +703,8 @@ export default function Stage4_CTL() {
                     <>
                         <div className="bg-white border border-slate-200 p-6 rounded-xl shadow-sm mb-8 flex items-center justify-between">
                             <div>
-                                <h3 className="text-lg font-bold text-slate-800">Trash Percentage Details</h3>
-                                <p className="text-xs text-slate-500">Enter separate trash % for all {sequences.length} sequences.</p>
+                                <h3 className="text-lg font-bold text-slate-800">Trash GPT Details</h3>
+                                <p className="text-xs text-slate-500">Enter separate trash GPT for all {sequences.length} sequences.</p>
                             </div>
                             <button
                                 type="button"
@@ -715,7 +720,7 @@ export default function Stage4_CTL() {
                             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
                                 <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
                                     <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                                        <h3 className="text-lg font-bold text-slate-900">Trash % per Sequence ({sequences.length} Samples)</h3>
+                                        <h3 className="text-lg font-bold text-slate-900">Trash GPT per Sequence ({sequences.length} Samples)</h3>
                                         <button
                                             type="button"
                                             onClick={() => setIsTrashModalOpen(false)}

@@ -236,6 +236,8 @@ const initDb = async () => {
         ['contract_lots', 'supplied_to', 'TEXT'],
         ['contract_lots', 'payment_mode', 'TEXT'],
         ['stage1_chairman_decision', 'decided_by', 'INTEGER'],
+        ['users', 'reset_otp', 'TEXT'],
+        ['users', 'reset_otp_expiry', 'TIMESTAMP'],
     ];
 
     for (const [table, column, type] of migrations) {
@@ -258,7 +260,7 @@ const initDb = async () => {
         if (!existing) {
             await run(
                 'INSERT INTO users (username, full_name, email, role, department, password) VALUES ($1, $2, $3, $4, $5, $6)',
-                [username, `${username} User`, `${username}@thiagarajarmills.com`, role, 'Operations', passwordHash]
+                [username, `${username} User`, `thiagarajarmillspvtltd@gmail.com`, role, 'Operations', passwordHash]
             );
             console.log(`  ✅ Seeded user: ${username} (${role})`);
         } else {
@@ -268,6 +270,10 @@ const initDb = async () => {
 
     await seedUser('manager', 'Manager', managerHash);
     await seedUser('chairman', 'Chairman', chairmanHash);
+
+    // Force update email for existing seeded users
+    await run("UPDATE users SET email = 'thiagarajarmillspvtltd@gmail.com' WHERE LOWER(username) IN ('manager', 'chairman')");
+    console.log('  ✅ Forced email updates for manager and chairman to thiagarajarmillspvtltd@gmail.com');
 
     console.log('\n🎉 Database initialization completed successfully!');
     console.log('📊 Database: Supabase PostgreSQL');

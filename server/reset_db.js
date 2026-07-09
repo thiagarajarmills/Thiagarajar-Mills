@@ -51,7 +51,9 @@ async function resetDb() {
                 role TEXT,
                 department TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                password TEXT
+                password TEXT,
+                reset_otp TEXT,
+                reset_otp_expiry TIMESTAMP
             )`,
             `CREATE TABLE IF NOT EXISTS vendors (
                 vendor_id SERIAL PRIMARY KEY,
@@ -222,13 +224,13 @@ async function resetDb() {
 
         await client.query(
             'INSERT INTO users (username, full_name, email, role, department, password) VALUES ($1, $2, $3, $4, $5, $6)',
-            ['manager', 'Manager User', 'manager@thiagarajarmills.com', 'Manager', 'Operations', managerHash]
+            ['manager', 'Manager User', 'thiagarajarmillspvtltd@gmail.com', 'Manager', 'Operations', managerHash]
         );
         console.log('  ✅ Seeded: manager (password: manager)');
 
         await client.query(
             'INSERT INTO users (username, full_name, email, role, department, password) VALUES ($1, $2, $3, $4, $5, $6)',
-            ['chairman', 'Chairman User', 'chairman@thiagarajarmills.com', 'Chairman', 'Operations', chairmanHash]
+            ['chairman', 'Chairman User', 'thiagarajarmillspvtltd@gmail.com', 'Chairman', 'Operations', chairmanHash]
         );
         console.log('  ✅ Seeded: chairman (password: chairman)');
 

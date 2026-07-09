@@ -320,12 +320,12 @@ export default function Dashboard() {
                 <table className="w-full text-left">
                     <thead>
                         <tr className="bg-slate-50/50 border-b border-slate-200 text-slate-500 text-[10px] uppercase tracking-wider font-semibold">
-                            <th className="px-4 py-3">Contract ID</th>
-                            <th className="px-4 py-3">Lot No</th>
-                            <th className="px-4 py-3">Vendor</th>
-                            <th className="px-4 py-3">GST No</th>
-                            <th className="px-4 py-3">Progress</th>
-                            <th className="px-4 py-3 text-right">Action</th>
+                            <th className="px-4 py-3 w-[15%]">Contract ID</th>
+                            <th className="px-4 py-3 w-[8%] text-center">Lot No</th>
+                            <th className="px-4 py-3 w-[25%]">Vendor</th>
+                            <th className="px-2 py-3 w-[10%]">GST No</th>
+                            <th className="px-2 py-3 w-[340px]">Progress</th>
+                            <th className="px-4 py-3 w-[10%] text-right">Action</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -348,8 +348,8 @@ export default function Dashboard() {
                                         ? 'bg-slate-50/60 hover:bg-indigo-50/30 border-l-2 border-l-indigo-100'
                                         : 'hover:bg-indigo-50/20'
                                         }`}>
-                                    <td className="px-4 py-2 font-mono font-semibold tracking-tight"><span className="text-indigo-600 text-[13px] font-bold">{c.contract_id}</span></td>
-                                    <td className="px-4 py-2 font-mono text-slate-600 font-semibold text-[10px] text-center">
+                                    <td className="px-4 py-2 font-mono font-semibold tracking-tight w-[15%]"><span className="text-indigo-600 text-[13px] font-bold">{c.contract_id}</span></td>
+                                    <td className="px-4 py-2 font-mono text-slate-600 font-semibold text-[10px] text-center w-[8%]">
                                         {c.lot_id ? (
                                             <span className="bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-md text-indigo-700 font-bold uppercase shadow-sm">
                                                 {c.lot_number}
@@ -358,7 +358,7 @@ export default function Dashboard() {
                                             <span className="text-slate-400 font-bold">-</span>
                                         )}
                                     </td>
-                                    <td className="px-4 py-2">
+                                    <td className="px-4 py-2 w-[25%]">
                                         <div className="flex flex-col">
                                             <div className="flex items-center gap-1.5 min-w-0">
                                                 <span className="text-[13px] font-bold text-slate-900 truncate max-w-[150px]" title={c.vendor_name}>{c.vendor_name}</span>
@@ -366,8 +366,8 @@ export default function Dashboard() {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-2 text-slate-400 font-mono text-[10px]">{c.gst_number || '-'}</td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-2 py-2 text-slate-400 font-mono text-[10px] w-[10%] truncate">{c.gst_number || '-'}</td>
+                                    <td className="px-2 py-4 w-[340px]">
                                         <div className="flex items-center space-x-1">
                                             {(() => {
                                                 const steps = Boolean(c.is_privileged)
@@ -446,7 +446,7 @@ export default function Dashboard() {
                                             )}
                                         </div>
                                     </td>
-                                    <td className="px-4 py-2 text-right">
+                                    <td className="px-4 py-2 text-right w-[10%]">
                                         <div className="flex justify-end items-center space-x-2">
                                             {c.status.includes('Rejected') && user?.role === 'Manager' && (
                                                 <button

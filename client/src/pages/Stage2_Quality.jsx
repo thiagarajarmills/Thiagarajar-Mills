@@ -9,7 +9,12 @@ import { getFullUrl } from '../utils/urls';
 
 const formatDate = (dateStr) => {
     if (!dateStr) return '';
-    return dateStr.split('T')[0];
+    const cleanDate = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+    const parts = cleanDate.split('-');
+    if (parts.length === 3 && parts[0].length === 4) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    return cleanDate;
 };
 
 export default function Stage2_Quality() {

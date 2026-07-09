@@ -6,6 +6,16 @@ import { Plus, Trash2, Box, Calendar, Hash, Scale, AlertCircle, CheckCircle, Fil
 import PDFModal from '../components/PDFModal';
 import { getFullUrl } from '../utils/urls';
 
+const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    const cleanDate = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+    const parts = cleanDate.split('-');
+    if (parts.length === 3 && parts[0].length === 4) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    return cleanDate;
+};
+
 export default function Stage3_Sampling() {
     const params = useParams();
 
@@ -441,7 +451,7 @@ export default function Stage3_Sampling() {
                                         <div>
                                             <h4 className="font-bold text-slate-900 text-xl tracking-tight">{lot.lot_number}</h4>
                                             <div className="flex items-center text-xs font-medium text-slate-400 mt-1">
-                                                <Calendar size={14} className="mr-1.5" /> {lot.arrival_date ? lot.arrival_date.split('T')[0] : '-'}
+                                                <Calendar size={14} className="mr-1.5" /> {lot.arrival_date ? formatDate(lot.arrival_date) : '-'}
                                             </div>
                                         </div>
                                     </div>
