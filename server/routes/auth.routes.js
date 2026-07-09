@@ -60,18 +60,21 @@ router.get('/me', require('../middleware/auth.middleware').authenticateToken, (r
 
 // Send Verification Code (Forgot Password) Route
 router.post('/forgot-password', async (req, res) => {
-    const { email } = req.body;
+    const { email, username } = req.body;
 
-    if (!email) {
-        return res.status(400).json({ message: 'Email address is required' });
+    if (!email || !username) {
+        return res.status(400).json({ message: 'Username and email address are required' });
     }
 
     try {
-        // Look up user by email
-        const user = await get("SELECT * FROM users WHERE LOWER(email) = LOWER(?)", [email]);
+        // Look up user by both username and email
+        const user = await get(
+            "SELECT * FROM users WHERE LOWER(username) = LOWER(?) AND LOWER(email) = LOWER(?)",
+            [username, email]
+        );
 
         if (!user) {
-            return res.status(404).json({ message: 'No account found with this email address' });
+            return res.status(404).json({ message: 'No account found matching this username and email address' });
         }
 
         // Generate 6-digit OTP
@@ -113,17 +116,20 @@ router.post('/forgot-password', async (req, res) => {
 
 // Reset Password Route
 router.post('/reset-password', async (req, res) => {
-    const { email, otp, newPassword } = req.body;
+    const { email, username, otp, newPassword } = req.body;
 
-    if (!email || !otp || !newPassword) {
-        return res.status(400).json({ message: 'Email, verification code, and new password are required' });
+    if (!email || !username || !otp || !newPassword) {
+        return res.status(400).json({ message: 'Username, email, verification code, and new password are required' });
     }
 
     try {
-        const user = await get("SELECT * FROM users WHERE LOWER(email) = LOWER(?)", [email]);
+        const user = await get(
+            "SELECT * FROM users WHERE LOWER(username) = LOWER(?) AND LOWER(email) = LOWER(?)",
+            [username, email]
+        );
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found with provided email' });
+            return res.status(404).json({ message: 'User not found with provided credentials' });
         }
 
         // Verify OTP code

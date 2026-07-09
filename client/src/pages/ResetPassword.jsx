@@ -6,6 +6,7 @@ import { ArrowLeft, CheckCircle, Loader2, Mail, Key, ShieldCheck, AlertCircle } 
 export default function ResetPassword() {
     const navigate = useNavigate();
     const [step, setStep] = useState(1); // Step 1: Email verify, Step 2: Enter OTP & New Password
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [otp, setOtp] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -23,7 +24,7 @@ export default function ResetPassword() {
         setLoading(true);
 
         try {
-            const res = await api.post('/forgot-password', { email });
+            const res = await api.post('/forgot-password', { email, username });
             
             if (res.data.isSimulated && res.data.code) {
                 setSimulatedCode(res.data.code);
@@ -31,7 +32,7 @@ export default function ResetPassword() {
             
             setStep(2);
         } catch (err) {
-            setError(err.response?.data?.message || "No account found with this email address. Please check and try again.");
+            setError(err.response?.data?.message || "No account found matching this username and email address. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -57,6 +58,7 @@ export default function ResetPassword() {
         try {
             await api.post('/reset-password', {
                 email,
+                username,
                 otp,
                 newPassword
             });
@@ -98,7 +100,7 @@ export default function ResetPassword() {
                     </h1>
                     <p className="text-slate-500 mt-2 text-xs">
                         {step === 1 
-                            ? 'Enter your registered email address to receive a verification code.' 
+                            ? 'Enter your username and registered email address to receive a verification code.' 
                             : `We have sent a verification code to ${email}`}
                     </p>
                 </div>
@@ -118,6 +120,22 @@ export default function ResetPassword() {
 
                 {!success && step === 1 && (
                     <form onSubmit={handleSendOtp} className="space-y-5">
+                        <div>
+                            <label className="block text-slate-700 text-xs font-semibold mb-2">Username</label>
+                            <input
+                                type="text"
+                                name="username"
+                                className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder-slate-400 text-xs shadow-sm"
+                                placeholder="e.g. manager"
+                                value={username}
+                                onChange={(e) => {
+                                    setUsername(e.target.value);
+                                    setError('');
+                                }}
+                                required
+                            />
+                        </div>
+
                         <div>
                             <label className="block text-slate-700 text-xs font-semibold mb-2">Email Address</label>
                             <input
