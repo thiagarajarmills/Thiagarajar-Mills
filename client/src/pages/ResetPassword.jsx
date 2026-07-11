@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import api from '../api';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, Loader2, Mail, Key, ShieldCheck, AlertCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Loader2, Mail, Key, ShieldCheck, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function ResetPassword() {
     const navigate = useNavigate();
@@ -11,6 +11,8 @@ export default function ResetPassword() {
     const [otp, setOtp] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -198,32 +200,50 @@ export default function ResetPassword() {
 
                             <div>
                                 <label className="block text-slate-700 text-xs font-semibold mb-2">New Password</label>
-                                <input
-                                    type="password"
-                                    className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder-slate-400 text-xs shadow-sm"
-                                    placeholder="Minimum 6 characters"
-                                    value={newPassword}
-                                    onChange={(e) => {
-                                        setNewPassword(e.target.value);
-                                        setError('');
-                                    }}
-                                    required
-                                />
+                                <div className="relative">
+                                    <input
+                                        type={showNewPassword ? "text" : "password"}
+                                        className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder-slate-400 text-xs shadow-sm"
+                                        placeholder="Minimum 6 characters"
+                                        value={newPassword}
+                                        onChange={(e) => {
+                                            setNewPassword(e.target.value);
+                                            setError('');
+                                        }}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                                    >
+                                        {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                    </button>
+                                </div>
                             </div>
 
                             <div>
                                 <label className="block text-slate-700 text-xs font-semibold mb-2">Confirm New Password</label>
-                                <input
-                                    type="password"
-                                    className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder-slate-400 text-xs shadow-sm"
-                                    placeholder="Re-enter password"
-                                    value={confirmPassword}
-                                    onChange={(e) => {
-                                        setConfirmPassword(e.target.value);
-                                        setError('');
-                                    }}
-                                    required
-                                />
+                                <div className="relative">
+                                    <input
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder-slate-400 text-xs shadow-sm"
+                                        placeholder="Re-enter password"
+                                        value={confirmPassword}
+                                        onChange={(e) => {
+                                            setConfirmPassword(e.target.value);
+                                            setError('');
+                                        }}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                                    >
+                                        {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
