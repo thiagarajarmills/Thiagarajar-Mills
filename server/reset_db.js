@@ -207,7 +207,7 @@ async function resetDb() {
 
         // Recreate view
         await client.query(`DROP VIEW IF EXISTS vw_stage5_payment_details CASCADE`);
-        await client.query(`CREATE VIEW vw_stage5_payment_details AS
+        await client.query(`CREATE VIEW vw_stage5_payment_details WITH (security_invoker = true) AS
             SELECT c.contract_id, v.vendor_name AS party_name, c.cotton_type, c.price AS contract_rate,
                 c.quantity, l.lot_number AS lot_no, l.arrival_date, l.invoice_value, l.tds_amount,
                 l.cash_discount, l.net_amount_paid, l.bank_name, l.branch, l.account_no, l.ifsc_code,
@@ -233,6 +233,78 @@ async function resetDb() {
             ['chairman', 'Chairman User', 'thiagarajarmillspvtltd@gmail.com', 'Chairman', 'Operations', chairmanHash]
         );
         console.log('  ✅ Seeded: chairman (password: chairman)');
+
+        // ─── Enable RLS and Policies ──────────────────────────────────────────────────
+        console.log('\n🔒 Hardening database security policies...');
+        const rlsTables = [
+            'users',
+            'vendors',
+            'contracts',
+            'contract_payment_decision',
+            'stage1_chairman_decision',
+            'stage2_manager_report',
+            'stage2_chairman_decision',
+            'contract_lots',
+            'lot_decisions',
+            'stage_history'
+        ];
+
+        for (const table of rlsTables) {
+            try {
+                await client.query(`ALTER TABLE ${table} ENABLE ROW LEVEL SECURITY`);
+                console.log(`  🔒 RLS enabled on: ${table}`);
+            } catch (err) {
+                console.error(`  ❌ Error enabling RLS on ${table}:`, err.message);
+            }
+        }
+
+        const policies = [
+            {
+                name: 'allow_anon_select_contracts',
+                table: 'contracts',
+                sql: 'CREATE POLICY allow_anon_select_contracts ON contracts FOR SELECT TO anon USING (true)'
+            },
+            {
+                name: 'allow_anon_select_lots',
+                table: 'contract_lots',
+                sql: 'CREATE POLICY allow_anon_select_lots ON contract_lots FOR SELECT TO anon USING (true)'
+            },
+            {
+                name: 'allow_anon_select_lot_decisions',
+                table: 'lot_decisions',
+                sql: 'CREATE POLICY allow_anon_select_lot_decisions ON lot_decisions FOR SELECT TO anon USING (true)'
+            },
+            {
+                name: 'allow_anon_select_s1_dec',
+                table: 'stage1_chairman_decision',
+                sql: 'CREATE POLICY allow_anon_select_s1_dec ON stage1_chairman_decision FOR SELECT TO anon USING (true)'
+            },
+            {
+                name: 'allow_anon_select_s2_rep',
+                table: 'stage2_manager_report',
+                sql: 'CREATE POLICY allow_anon_select_s2_rep ON stage2_manager_report FOR SELECT TO anon USING (true)'
+            },
+            {
+                name: 'allow_anon_select_s2_dec',
+                table: 'stage2_chairman_decision',
+                sql: 'CREATE POLICY allow_anon_select_s2_dec ON stage2_chairman_decision FOR SELECT TO anon USING (true)'
+            },
+            {
+                name: 'allow_anon_select_payment_dec',
+                table: 'contract_payment_decision',
+                sql: 'CREATE POLICY allow_anon_select_payment_dec ON contract_payment_decision FOR SELECT TO anon USING (true)'
+            }
+        ];
+
+        for (const policy of policies) {
+            try {
+                await client.query(`DROP POLICY IF EXISTS ${policy.name} ON ${policy.table}`);
+                await client.query(policy.sql);
+                console.log(`  🛡️  Policy applied: ${policy.name}`);
+            } catch (err) {
+                console.error(`  ❌ Error applying policy ${policy.name}:`, err.message);
+            }
+        }
 
         console.log('\n🎉 Database reset and reinitialized successfully!');
         console.log('🔑 Credentials: manager/manager  |  chairman/chairman\n');

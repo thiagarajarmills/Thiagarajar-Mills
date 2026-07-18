@@ -49,6 +49,26 @@ export default function Dashboard() {
                     { event: '*', schema: 'public', table: 'lot_decisions' },
                     () => fetchContracts()
                 )
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'stage1_chairman_decision' },
+                    () => fetchContracts()
+                )
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'stage2_manager_report' },
+                    () => fetchContracts()
+                )
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'stage2_chairman_decision' },
+                    () => fetchContracts()
+                )
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'contract_payment_decision' },
+                    () => fetchContracts()
+                )
                 .subscribe();
         }
 

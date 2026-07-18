@@ -501,11 +501,16 @@ router.post('/contracts/:id/stage2', authenticateToken, async (req, res) => {
     try {
         await withTransaction(async (tx) => {
             // ENFORCEMENT: Check Stage Sequence
-            const contract = await tx.get("SELECT * FROM contracts WHERE contract_id = ? FOR UPDATE", [id]);
+            const contract = await tx.get(`
+                SELECT c.*, v.is_privileged 
+                FROM contracts c
+                JOIN vendors v ON c.vendor_id = v.vendor_id
+                WHERE c.contract_id = ? FOR UPDATE
+            `, [id]);
             if (!contract) throw new Error("Contract not found");
 
             const current = await determineStageStatus(contract, null);
-            if (!isStageAllowed(contract.is_privileged === 1, current.stage, 2)) {
+            if (!isStageAllowed(Boolean(contract.is_privileged), current.stage, 2)) {
                 throw new Error(`Cannot enter Quality Report. Contract is currently at Stage ${current.stage}: ${current.status || 'Locked'}`);
             }
 
@@ -565,10 +570,15 @@ router.post('/contracts/:id/stage3', authenticateToken, async (req, res) => {
 
         await withTransaction(async (tx) => {
             // ENFORCEMENT: Check Stage Sequence + Fetch contract for quantity validation
-            const contract = await tx.get("SELECT * FROM contracts WHERE contract_id = ? FOR UPDATE", [id]);
+            const contract = await tx.get(`
+                SELECT c.*, v.is_privileged 
+                FROM contracts c
+                JOIN vendors v ON c.vendor_id = v.vendor_id
+                WHERE c.contract_id = ? FOR UPDATE
+            `, [id]);
             if (!contract) throw new Error("Contract not found");
             const current = await determineStageStatus(contract, null);
-            if (!isStageAllowed(contract.is_privileged === 1, current.stage, 3)) {
+            if (!isStageAllowed(Boolean(contract.is_privileged), current.stage, 3)) {
                 throw new Error(`Cannot enter Lots. Contract is currently at Stage ${current.stage}: ${current.status}`);
             }
 
@@ -632,12 +642,17 @@ router.post('/contracts/:id/lots/:lotId/stage4', authenticateToken, async (req, 
     try {
         await withTransaction(async (tx) => {
             // LOCK the contract row
-            const contract = await tx.get("SELECT * FROM contracts WHERE contract_id = ? FOR UPDATE", [id]);
+            const contract = await tx.get(`
+                SELECT c.*, v.is_privileged 
+                FROM contracts c
+                JOIN vendors v ON c.vendor_id = v.vendor_id
+                WHERE c.contract_id = ? FOR UPDATE
+            `, [id]);
             const lot = await tx.get("SELECT * FROM contract_lots WHERE lot_id = ? AND contract_id = ?", [lotId, id]);
             if (!contract || !lot) throw new Error("Contract or Lot not found");
 
             const current = await determineStageStatus(contract, lot);
-            if (!isStageAllowed(contract.is_privileged === 1, current.stage, 4)) {
+            if (!isStageAllowed(Boolean(contract.is_privileged), current.stage, 4)) {
                 throw new Error(`Cannot enter CTL results. Lot is currently at Stage ${current.stage}: ${current.status}`);
             }
 
@@ -688,7 +703,12 @@ router.post('/contracts/:id/payment', authenticateToken, async (req, res) => {
     try {
         await withTransaction(async (tx) => {
             // ENFORCEMENT: Check Stage Sequence (Privileged Only)
-            const contract = await tx.get("SELECT * FROM contracts WHERE contract_id = ? FOR UPDATE", [id]);
+            const contract = await tx.get(`
+                SELECT c.*, v.is_privileged 
+                FROM contracts c
+                JOIN vendors v ON c.vendor_id = v.vendor_id
+                WHERE c.contract_id = ? FOR UPDATE
+            `, [id]);
             if (!contract) throw new Error("Contract not found");
 
             const current = await determineStageStatus(contract, null);
@@ -766,7 +786,12 @@ router.post('/contracts/:id/lots/:lotId/stage5', authenticateToken, async (req, 
     try {
         await withTransaction(async (tx) => {
             // ENFORCEMENT: Check Stage Sequence (Normal Only)
-            const contract = await tx.get("SELECT * FROM contracts WHERE contract_id = ? FOR UPDATE", [id]);
+            const contract = await tx.get(`
+                SELECT c.*, v.is_privileged 
+                FROM contracts c
+                JOIN vendors v ON c.vendor_id = v.vendor_id
+                WHERE c.contract_id = ? FOR UPDATE
+            `, [id]);
             const lot = await tx.get("SELECT * FROM contract_lots WHERE lot_id = ? AND contract_id = ?", [lotId, id]);
             if (!contract || !lot) throw new Error("Contract or Lot not found");
 

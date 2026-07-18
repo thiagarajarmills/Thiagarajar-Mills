@@ -197,7 +197,7 @@ const initDb = async () => {
     // ─── Create View ──────────────────────────────────────────────────────────────
     try {
         await run(`DROP VIEW IF EXISTS vw_stage5_payment_details`);
-        await run(`CREATE VIEW vw_stage5_payment_details AS
+        await run(`CREATE VIEW vw_stage5_payment_details WITH (security_invoker = true) AS
             SELECT
                 c.contract_id,
                 v.vendor_name AS party_name,
@@ -274,6 +274,78 @@ const initDb = async () => {
     // Force update email for existing seeded users
     await run("UPDATE users SET email = 'thiagarajarmillspvtltd@gmail.com' WHERE LOWER(username) IN ('manager', 'chairman')");
     console.log('  ✅ Forced email updates for manager and chairman to thiagarajarmillspvtltd@gmail.com');
+
+    // ─── Enable RLS and Policies ──────────────────────────────────────────────────
+    console.log('\n🔒 Hardening database security policies...');
+    const rlsTables = [
+        'users',
+        'vendors',
+        'contracts',
+        'contract_payment_decision',
+        'stage1_chairman_decision',
+        'stage2_manager_report',
+        'stage2_chairman_decision',
+        'contract_lots',
+        'lot_decisions',
+        'stage_history'
+    ];
+
+    for (const table of rlsTables) {
+        try {
+            await run(`ALTER TABLE ${table} ENABLE ROW LEVEL SECURITY`);
+            console.log(`  🔒 RLS enabled on: ${table}`);
+        } catch (err) {
+            console.error(`  ❌ Error enabling RLS on ${table}:`, err.message);
+        }
+    }
+
+    const policies = [
+        {
+            name: 'allow_anon_select_contracts',
+            table: 'contracts',
+            sql: 'CREATE POLICY allow_anon_select_contracts ON contracts FOR SELECT TO anon USING (true)'
+        },
+        {
+            name: 'allow_anon_select_lots',
+            table: 'contract_lots',
+            sql: 'CREATE POLICY allow_anon_select_lots ON contract_lots FOR SELECT TO anon USING (true)'
+        },
+        {
+            name: 'allow_anon_select_lot_decisions',
+            table: 'lot_decisions',
+            sql: 'CREATE POLICY allow_anon_select_lot_decisions ON lot_decisions FOR SELECT TO anon USING (true)'
+        },
+        {
+            name: 'allow_anon_select_s1_dec',
+            table: 'stage1_chairman_decision',
+            sql: 'CREATE POLICY allow_anon_select_s1_dec ON stage1_chairman_decision FOR SELECT TO anon USING (true)'
+        },
+        {
+            name: 'allow_anon_select_s2_rep',
+            table: 'stage2_manager_report',
+            sql: 'CREATE POLICY allow_anon_select_s2_rep ON stage2_manager_report FOR SELECT TO anon USING (true)'
+        },
+        {
+            name: 'allow_anon_select_s2_dec',
+            table: 'stage2_chairman_decision',
+            sql: 'CREATE POLICY allow_anon_select_s2_dec ON stage2_chairman_decision FOR SELECT TO anon USING (true)'
+        },
+        {
+            name: 'allow_anon_select_payment_dec',
+            table: 'contract_payment_decision',
+            sql: 'CREATE POLICY allow_anon_select_payment_dec ON contract_payment_decision FOR SELECT TO anon USING (true)'
+        }
+    ];
+
+    for (const policy of policies) {
+        try {
+            await run(`DROP POLICY IF EXISTS ${policy.name} ON ${policy.table}`);
+            await run(policy.sql);
+            console.log(`  🛡️  Policy applied: ${policy.name}`);
+        } catch (err) {
+            console.error(`  ❌ Error applying policy ${policy.name}:`, err.message);
+        }
+    }
 
     console.log('\n🎉 Database initialization completed successfully!');
     console.log('📊 Database: Supabase PostgreSQL');
