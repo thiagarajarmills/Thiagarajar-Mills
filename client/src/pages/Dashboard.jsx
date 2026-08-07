@@ -605,10 +605,8 @@ export default function Dashboard() {
                                             <CheckCircle size={16} className="text-[#8B5A2B]" />
                                             <span>Manually Completed</span>
                                         </div>
-                                        {completingLoading ? (
+                                        {completingLoading && (
                                             <span className="text-[10px] animate-pulse">Updating...</span>
-                                        ) : (
-                                            <span className="text-[10px] px-2 py-0.5 rounded bg-[#8B5A2B] text-white">Mark as Done</span>
                                         )}
                                     </button>
                                 ) : (

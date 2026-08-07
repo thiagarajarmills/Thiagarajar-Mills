@@ -907,6 +907,13 @@ router.post('/contracts/:id/manual-complete', authenticateToken, async (req, res
     const { id } = req.params;
 
     try {
+        // Dynamically ensure column exists in DB table if not migrated yet
+        try {
+            await run(`ALTER TABLE contracts ADD COLUMN IF NOT EXISTS is_manually_completed BOOLEAN DEFAULT FALSE`);
+        } catch (migErr) {
+            console.log('[MIGRATION_AUTO_RUN]', migErr.message);
+        }
+
         await run(`UPDATE contracts SET is_manually_completed = TRUE, updated_at = CURRENT_TIMESTAMP WHERE contract_id = ?`, [id]);
 
         await run(`INSERT INTO stage_history (contract_id, stage_number, action, performed_by, remarks) VALUES (?, 6, 'Manually Completed', ?, 'Contract manually marked as completed from Dashboard')`,
