@@ -105,13 +105,19 @@ export default function Dashboard() {
         if (!contract) return;
         try {
             setCompletingLoading(true);
-            const safeContractId = encodeURIComponent(String(contract.contract_id).split('/').join('---'));
+            const targetId = contract.contract_id;
+            const safeContractId = encodeURIComponent(String(targetId).split('/').join('---'));
+            
+            // Optimistic instant UI update
+            setContracts(prev => prev.map(c => c.contract_id === targetId ? { ...c, is_manually_completed: true, status: 'Manually Completed', stage: 6 } : c));
+            
             await api.post(`/contracts/${safeContractId}/manual-complete`);
             setSelectedContractModal(null);
             fetchContracts();
         } catch (e) {
             console.error('[MANUAL_COMPLETE_ERROR]', e);
             alert('Error completing contract: ' + (e.response?.data?.error || e.message));
+            fetchContracts();
         } finally {
             setCompletingLoading(false);
         }

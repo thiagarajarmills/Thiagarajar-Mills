@@ -904,7 +904,9 @@ router.post('/contracts/:id/resume', authenticateToken, async (req, res) => {
 
 // MANUALLY COMPLETE CONTRACT
 router.post('/contracts/:id/manual-complete', authenticateToken, async (req, res) => {
-    const { id } = req.params;
+    let { id } = req.params;
+    const rawId = id;
+    const decodedId = decodeURIComponent(id).split('---').join('/');
 
     try {
         // Dynamically ensure column exists in DB table if not migrated yet
@@ -914,10 +916,11 @@ router.post('/contracts/:id/manual-complete', authenticateToken, async (req, res
             console.log('[MIGRATION_AUTO_RUN]', migErr.message);
         }
 
-        await run(`UPDATE contracts SET is_manually_completed = TRUE, updated_at = CURRENT_TIMESTAMP WHERE contract_id = ?`, [id]);
+        const resUpdate = await run(`UPDATE contracts SET is_manually_completed = TRUE, updated_at = CURRENT_TIMESTAMP WHERE contract_id = ? OR contract_id = ?`, [decodedId, rawId]);
+        console.log(`[MANUAL_COMPLETE] Contract ${decodedId} updated. Changes: ${resUpdate.changes}`);
 
         await run(`INSERT INTO stage_history (contract_id, stage_number, action, performed_by, remarks) VALUES (?, 6, 'Manually Completed', ?, 'Contract manually marked as completed from Dashboard')`,
-            [id, req.user.user_id]);
+            [decodedId, req.user.user_id]);
 
         res.json({ message: "Contract marked as manually completed" });
     } catch (e) {
