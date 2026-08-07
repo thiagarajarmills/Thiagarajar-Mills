@@ -238,6 +238,7 @@ const initDb = async () => {
         ['stage1_chairman_decision', 'decided_by', 'INTEGER'],
         ['users', 'reset_otp', 'TEXT'],
         ['users', 'reset_otp_expiry', 'TIMESTAMP'],
+        ['contracts', 'is_manually_completed', 'BOOLEAN DEFAULT FALSE'],
     ];
 
     for (const [table, column, type] of migrations) {

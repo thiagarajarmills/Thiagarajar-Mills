@@ -109,6 +109,11 @@ const getStageIndex = (isPrivileged, stage) => {
 };
 
 const determineStageStatus = async (contract, lot) => {
+    const cObj = await get("SELECT is_manually_completed FROM contracts WHERE contract_id = ?", [contract.contract_id]);
+    if (cObj && (cObj.is_manually_completed === true || cObj.is_manually_completed === 1 || cObj.is_manually_completed === 'true')) {
+        return { stage: 6, status: "Manually Completed" };
+    }
+
     const vendor = await get("SELECT is_privileged FROM vendors WHERE vendor_id = (SELECT vendor_id FROM contracts WHERE contract_id = ?)", [contract.contract_id]);
     const isPrivileged = vendor && vendor.is_privileged;
 
@@ -885,6 +890,23 @@ router.post('/contracts/:id/resume', authenticateToken, async (req, res) => {
         res.json({ message: "Contract resumed to Stage 2" });
     } catch (e) {
         console.error('[RESUME_ERROR]', e);
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// MANUALLY COMPLETE CONTRACT
+router.post('/contracts/:id/manual-complete', authenticateToken, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await run(`UPDATE contracts SET is_manually_completed = TRUE, updated_at = CURRENT_TIMESTAMP WHERE contract_id = ?`, [id]);
+
+        await run(`INSERT INTO stage_history (contract_id, stage_number, action, performed_by, remarks) VALUES (?, 6, 'Manually Completed', ?, 'Contract manually marked as completed from Dashboard')`,
+            [id, req.user.user_id]);
+
+        res.json({ message: "Contract marked as manually completed" });
+    } catch (e) {
+        console.error('[MANUAL_COMPLETE_ERROR]', e);
         res.status(500).json({ error: e.message });
     }
 });

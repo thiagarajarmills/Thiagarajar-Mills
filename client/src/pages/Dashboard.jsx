@@ -24,6 +24,8 @@ export default function Dashboard() {
     const [filterStatus, setFilterStatus] = useState('pending'); // Default to Pending
     const [sortBy, setSortBy] = useState('all'); // Default: Show All Stages
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedContractModal, setSelectedContractModal] = useState(null);
+    const [completingLoading, setCompletingLoading] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -92,10 +94,27 @@ export default function Dashboard() {
 
     const getStatusColor = (status) => {
         if (!status) return 'text-slate-400 bg-slate-50 border-slate-100';
+        if (status === 'Manually Completed' || status.includes('Manually')) return 'text-[#5C3A21] bg-[#F5EBE1] border-[#8B5A2B]';
         if (status.includes('Pending')) return 'text-amber-700 bg-amber-50 border-amber-200';
         if (status === 'Closed' || status.includes('Approved')) return 'text-emerald-700 bg-emerald-50 border-emerald-200';
         if (status.includes('Rollback') || status.includes('Rejected') || status.includes('Revision') || status.includes('Modify')) return 'text-rose-700 bg-rose-50 border-rose-200';
         return 'text-slate-600 bg-slate-100 border-slate-200';
+    };
+
+    const handleManualComplete = async (contract) => {
+        if (!contract) return;
+        try {
+            setCompletingLoading(true);
+            const safeContractId = encodeURIComponent(String(contract.contract_id).split('/').join('---'));
+            await api.post(`/contracts/${safeContractId}/manual-complete`);
+            setSelectedContractModal(null);
+            fetchContracts();
+        } catch (e) {
+            console.error('[MANUAL_COMPLETE_ERROR]', e);
+            alert('Error completing contract: ' + (e.response?.data?.error || e.message));
+        } finally {
+            setCompletingLoading(false);
+        }
     };
 
     const handleAction = (c) => {
@@ -193,7 +212,7 @@ export default function Dashboard() {
                 matchesStatus = c.status.includes('Pending') || c.status.includes('Rollback') || c.status.includes('Revision');
             }
         }
-        else if (filterStatus === 'approved') matchesStatus = c.status.includes('Approved') || c.status === 'Closed';
+        else if (filterStatus === 'approved') matchesStatus = c.status.includes('Approved') || c.status === 'Closed' || c.status === 'Manually Completed' || Boolean(c.is_manually_completed);
         else if (filterStatus === 'rejected') matchesStatus = c.status.includes('Rejected'); // Rollback/Revision moved to Pending for clarity
 
         return matchesSearch && matchesStatus;
@@ -248,7 +267,7 @@ export default function Dashboard() {
             }
             return c.status.includes('Pending') || c.status.includes('Rollback') || c.status.includes('Revision');
         }).length,
-        completed: contracts.filter(c => c.status === 'Closed' || c.status.includes('Approved')).length,
+        completed: contracts.filter(c => c.status === 'Closed' || c.status.includes('Approved') || c.status === 'Manually Completed' || Boolean(c.is_manually_completed)).length,
         attention: contracts.filter(c => c.status.includes('Rollback') || c.status.includes('Revision')).length
     };
 
@@ -368,7 +387,30 @@ export default function Dashboard() {
                                         ? 'bg-slate-50/60 hover:bg-indigo-50/30 border-l-2 border-l-indigo-100'
                                         : 'hover:bg-indigo-50/20'
                                         }`}>
-                                    <td className="px-4 py-2 font-mono font-semibold tracking-tight w-[15%]"><span className="text-indigo-600 text-[13px] font-bold">{c.contract_id}</span></td>
+                                    <td className="px-4 py-2 font-mono font-semibold tracking-tight w-[15%]">
+                                        <div className="flex flex-col items-start gap-0.5">
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedContractModal(c);
+                                                }}
+                                                className={`text-[13px] font-bold hover:underline transition-all cursor-pointer ${
+                                                    c.status === 'Manually Completed' || Boolean(c.is_manually_completed)
+                                                        ? 'text-[#6B3E26] hover:text-[#4A2B1A]'
+                                                        : 'text-indigo-600 hover:text-indigo-800'
+                                                }`}
+                                                title="Click for options"
+                                            >
+                                                {c.contract_id}
+                                            </button>
+                                            {(c.status === 'Manually Completed' || Boolean(c.is_manually_completed)) && (
+                                                <span className="inline-block text-[8px] font-bold px-1.5 py-0.2 rounded border border-[#8B5A2B] bg-[#F5EBE1] text-[#5C3A21] uppercase tracking-wider">
+                                                    Manually Completed
+                                                </span>
+                                            )}
+                                        </div>
+                                    </td>
                                     <td className="px-4 py-2 font-mono text-slate-600 font-semibold text-[10px] text-center w-[8%]">
                                         {c.lot_id ? (
                                             <span className="bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-md text-indigo-700 font-bold uppercase shadow-sm">
@@ -492,6 +534,104 @@ export default function Dashboard() {
                     </tbody>
                 </table>
             </div>
+
+            {/* CONTRACT ACTION MODAL */}
+            {selectedContractModal && (
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-150">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full border border-slate-100 overflow-hidden text-slate-900">
+                        {/* Modal Header */}
+                        <div className="bg-slate-50/80 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                            <div>
+                                <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Contract Options</span>
+                                <h3 className="text-lg font-extrabold text-slate-900 font-mono">
+                                    {selectedContractModal.contract_id}
+                                </h3>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setSelectedContractModal(null)}
+                                className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="p-6 space-y-4">
+                            <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-xs space-y-1.5">
+                                <div className="flex justify-between">
+                                    <span className="text-slate-400 font-medium">Vendor:</span>
+                                    <span className="font-bold text-slate-800">{selectedContractModal.vendor_name}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-slate-400 font-medium">Current Status:</span>
+                                    <span className={`font-bold px-2 py-0.5 rounded text-[10px] border ${getStatusColor(selectedContractModal.status)}`}>
+                                        {selectedContractModal.status}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <p className="text-xs text-slate-500 text-center font-medium">
+                                What action would you like to perform for contract <span className="font-mono font-bold text-slate-700">{selectedContractModal.contract_id}</span>?
+                            </p>
+
+                            <div className="space-y-3 pt-1">
+                                {/* View Contract Option */}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const c = selectedContractModal;
+                                        setSelectedContractModal(null);
+                                        handleAction(c);
+                                    }}
+                                    className="w-full flex items-center justify-between p-3.5 bg-indigo-50/80 hover:bg-indigo-100/80 text-indigo-700 rounded-xl border border-indigo-200 font-bold text-xs transition-all shadow-xs cursor-pointer group"
+                                >
+                                    <div className="flex items-center space-x-2.5">
+                                        <FileText size={16} className="text-indigo-600" />
+                                        <span>View Contract</span>
+                                    </div>
+                                    <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                                </button>
+
+                                {/* Manually Completed Option */}
+                                {selectedContractModal.status !== 'Manually Completed' && !selectedContractModal.is_manually_completed ? (
+                                    <button
+                                        type="button"
+                                        disabled={completingLoading}
+                                        onClick={() => handleManualComplete(selectedContractModal)}
+                                        className="w-full flex items-center justify-between p-3.5 bg-[#F5EBE1] hover:bg-[#EBDCCB] text-[#5C3A21] rounded-xl border border-[#8B5A2B] font-bold text-xs transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                                    >
+                                        <div className="flex items-center space-x-2.5">
+                                            <CheckCircle size={16} className="text-[#8B5A2B]" />
+                                            <span>Manually Completed</span>
+                                        </div>
+                                        {completingLoading ? (
+                                            <span className="text-[10px] animate-pulse">Updating...</span>
+                                        ) : (
+                                            <span className="text-[10px] px-2 py-0.5 rounded bg-[#8B5A2B] text-white">Mark as Done</span>
+                                        )}
+                                    </button>
+                                ) : (
+                                    <div className="p-3 bg-[#F5EBE1] text-[#5C3A21] rounded-xl border border-[#8B5A2B] text-center font-bold text-xs flex items-center justify-center gap-1.5">
+                                        <CheckCircle size={14} /> Manually Completed
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="bg-slate-50/50 px-6 py-3 border-t border-slate-100 flex justify-end">
+                            <button
+                                type="button"
+                                onClick={() => setSelectedContractModal(null)}
+                                className="px-4 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
