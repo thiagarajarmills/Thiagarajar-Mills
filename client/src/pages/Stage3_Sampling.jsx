@@ -492,7 +492,7 @@ export default function Stage3_Sampling() {
                                             }}
                                             className="flex items-center gap-2 text-xs font-bold text-indigo-600 hover:text-white bg-indigo-50 hover:bg-indigo-600 px-4 py-2.5 rounded-xl transition-all shadow-sm active:scale-95"
                                         >
-                                            {lot.stage >= 5 ? 'Payment' : 'CTL Entry'}
+                                            {(lot.stage >= 5 || (lot.s4Decision && lot.s4Decision.decision === 'Approve')) ? 'Payment' : 'CTL Entry'}
                                             <ArrowRight size={16} />
                                         </button>
                                     </div>

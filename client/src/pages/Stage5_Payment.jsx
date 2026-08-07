@@ -121,16 +121,21 @@ export default function Stage5_Payment() {
             const res = await api.get(`/contracts/${safeId}`);
             setContract(res.data);
 
-            // NAVIGATION GUARD
-            const workflow = Boolean(res.data.is_privileged) ? [1, 2, 5, 3, 4] : [1, 2, 3, 4, 5];
-            const currentIdx = workflow.indexOf(res.data.stage === 6 ? 6 : res.data.stage);
-            const targetIdx = workflow.indexOf(5);
-
-            if (currentIdx === -1 || currentIdx < targetIdx) {
-                const prevStage = Boolean(res.data.is_privileged) ? "Quality (Stage 2)" : "Lot Entry (Stage 3)";
-                alert(`This contract/lot is not yet ready for Payment Entry. Please complete ${prevStage} first.`);
-                navigate('/dashboard');
-                return;
+            // NAVIGATION GUARD - Decision level check per vendor type and lot
+            const isPrivilegedVendor = Boolean(res.data.is_privileged);
+            if (isPrivilegedVendor) {
+                if (res.data.stage2Decision?.decision !== 'Approve') {
+                    alert(`This contract is not yet ready for Payment Entry. Please complete Quality (Stage 2) approval first.`);
+                    navigate('/dashboard');
+                    return;
+                }
+            } else if (lotId && res.data.lots) {
+                const targetLot = res.data.lots.find(l => l.lot_id.toString() === lotId.toString());
+                if (!targetLot || targetLot.s4Decision?.decision !== 'Approve') {
+                    alert(`This lot is not yet ready for Payment Entry. Please complete CTL (Stage 4) approval first.`);
+                    navigate('/dashboard');
+                    return;
+                }
             }
 
             if (lotId) {
