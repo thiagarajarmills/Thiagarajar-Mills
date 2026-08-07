@@ -109,9 +109,17 @@ const getStageIndex = (isPrivileged, stage) => {
 };
 
 const determineStageStatus = async (contract, lot) => {
-    const cObj = await get("SELECT is_manually_completed FROM contracts WHERE contract_id = ?", [contract.contract_id]);
-    if (cObj && (cObj.is_manually_completed === true || cObj.is_manually_completed === 1 || cObj.is_manually_completed === 'true')) {
+    if (contract && (contract.is_manually_completed === true || contract.is_manually_completed === 1 || contract.is_manually_completed === 'true')) {
         return { stage: 6, status: "Manually Completed" };
+    }
+
+    try {
+        const cObj = await get("SELECT is_manually_completed FROM contracts WHERE contract_id = ?", [contract.contract_id]);
+        if (cObj && (cObj.is_manually_completed === true || cObj.is_manually_completed === 1 || cObj.is_manually_completed === 'true')) {
+            return { stage: 6, status: "Manually Completed" };
+        }
+    } catch (err) {
+        // Column might not exist yet, safely proceed
     }
 
     const vendor = await get("SELECT is_privileged FROM vendors WHERE vendor_id = (SELECT vendor_id FROM contracts WHERE contract_id = ?)", [contract.contract_id]);
@@ -220,7 +228,7 @@ router.get('/contracts', authenticateToken, async (req, res) => {
         const processed = await Promise.all(rows.map(async (row) => {
             try {
                 // Separate Contract and Lot data for helper
-                const contractData = { contract_id: row.contract_id };
+                const contractData = { contract_id: row.contract_id, is_manually_completed: row.is_manually_completed };
                 const lotData = row.lot_id ? {
                     lot_id: row.lot_id,
                     mic_value: row.mic_value,
@@ -254,7 +262,7 @@ router.get('/contracts', authenticateToken, async (req, res) => {
                 return item;
             } catch (e) {
                 console.error('Error processing row', e);
-                return null;
+                return { ...row, stage: 1, status: "Pending" };
             }
         }));
 
